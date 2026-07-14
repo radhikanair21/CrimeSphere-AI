@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CrimeSphere AI — Command Intelligence Platform</title>
+  <meta name="description" content="CrimeSphere AI: India's First Unified Cyber + Physical Crime Intelligence Platform. AI-Powered GIS Crime Prediction & Predictive Patrol Routing." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ═══════════════════════════════════ HEADER ═══════════════════════════════════ -->
+  <header id="header">
+    <div class="header-left">
+      <div class="logo-wrap">
+        <span class="logo-hex">⬡</span>
+        <div class="logo-text">
+          <span class="logo-name">CrimeSphere AI</span>
+          <span class="logo-tagline">PREDICT. PREVENT. PROTECT.</span>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="header-right">
+      <div class="header-info">
+        <div class="live-time-wrap">
+          <span class="live-date" id="live-date"></span>
+          <span class="live-time" id="live-time"></span>
+        </div>
+        <div class="status-pill online">
+          <span class="status-dot"></span>
+          SYSTEM ONLINE
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════ LAYOUT ════════════════════════════════════ -->
+  <div id="main-layout">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+      <nav class="sidebar-nav">
+        <a class="nav-item active" data-screen="dashboard" href="#" id="nav-dashboard">
+          <i class="fa-solid fa-map-location-dot nav-icon"></i>
+          <span class="nav-label">Dashboard</span>
+          <span class="nav-indicator"></span>
+        </a>
+        <a class="nav-item" data-screen="prediction" href="#" id="nav-prediction">
+          <i class="fa-solid fa-brain nav-icon"></i>
+          <span class="nav-label">Prediction</span>
+        </a>
+        <a class="nav-item" data-screen="heatmap" href="#" id="nav-heatmap">
+          <i class="fa-solid fa-fire nav-icon"></i>
+          <span class="nav-label">Heatmap</span>
+        </a>
+        <a class="nav-item" data-screen="routing" href="#" id="nav-routing">
+          <i class="fa-solid fa-route nav-icon"></i>
+          <span class="nav-label">Patrol Routing</span>
+        </a>
+        <a class="nav-item" data-screen="officer" href="#" id="nav-officer">
+          <i class="fa-solid fa-mobile-screen-button nav-icon"></i>
+          <span class="nav-label">Officer App</span>
+        </a>
+        <div class="nav-divider"></div>
+        <a class="nav-item" data-screen="settings" href="#" id="nav-settings">
+          <i class="fa-solid fa-gear nav-icon"></i>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-team">
+          <i class="fa-solid fa-users"></i>
+          <span>Team nullRoot</span>
+        </div>
+        <div class="sidebar-version">v2.4.1 • Build 2026</div>
+      </div>
+    </aside>
+
+    <!-- CONTENT AREA -->
+    <main id="content">
+
+      <!-- ── SCREEN 1: GIS DASHBOARD ── -->
+      <div id="screen-dashboard" class="screen active">
+
+        <div class="screen-header">
+          <div class="screen-title-wrap">
+            <h1 class="screen-title">
+              <i class="fa-solid fa-map-location-dot"></i>
+              GIS Crime Intelligence Dashboard
+            </h1>
+            <p class="screen-subtitle">Real-time command overview — Ahmedabad Metropolitan Area</p>
+          </div>
+          <div class="screen-actions">
+            <button class="btn-ghost" id="dash-refresh-btn">
+              <i class="fa-solid fa-arrows-rotate"></i> Refresh
+            </button>
+            <button class="btn-accent" id="dash-alert-btn">
+              <i class="fa-solid fa-bell"></i> <span id="dash-alert-count">3</span> Alerts
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI CARDS -->
+        <div class="kpi-row" id="kpi-row">
+          <div class="kpi-card kpi-danger">
+            <div class="kpi-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="kpi-body">
+              <div class="kpi-value" id="kpi-alerts">24</div>
+              <div class="kpi-label">Active Alerts</div>
+            </div>
+            <div class="kpi-trend up"><i class="fa-solid fa-arrow-trend-up"></i> +3</div>
+          </div>
+          <div class="kpi-card kpi-warning">
+            <div class="kpi-icon"><i class="fa-solid fa-location-dot"></i></div>
+            <div class="kpi-body">
+              <div class="kpi-value" id="kpi-zones">8</div>
+              <div class="kpi-label">High-Risk Zones</div>
+            </div>
+            <div class="kpi-trend up"><i class="fa-solid fa-arrow-trend-up"></i> +2</div>
+          </div>
+          <div class="kpi-card kpi-info">
+            <div class="kpi-icon"><i class="fa-solid fa-car"></i></div>
+            <div class="kpi-body">
+              <div class="kpi-value" id="kpi-patrols">6</div>
+              <div class="kpi-label">Patrol Units</div>
+            </div>
+            <div class="kpi-trend neutral"><i class="fa-solid fa-minus"></i> Deployed</div>
+          </div>
+          <div class="kpi-card kpi-success">
+            <div class="kpi-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="kpi-body">
+              <div class="kpi-value" id="kpi-prevented">147</div>
+              <div class="kpi-label">Crimes Prevented</div>
+            </div>
+            <div class="kpi-trend down"><i class="fa-solid fa-arrow-trend-down"></i> Today</div>
+          </div>
+          <div class="kpi-card kpi-purple">
+            <div class="kpi-icon"><i class="fa-solid fa-clock"></i></div>
+            <div class="kpi-body">
+              <div class="kpi-value" id="kpi-response">12.6<span class="kpi-unit">min</span></div>
+              <div class="kpi-label">Avg Response Time</div>
+            </div>
+            <div class="kpi-trend down"><i class="fa-solid fa-arrow-trend-down"></i> -30%</div>
+          </div>
+          <div class="kpi-card kpi-gold">
+            <div class="kpi-icon"><i class="fa-solid fa-brain"></i></div>
+            <div class="kpi-body">
+              <div class="kpi-value" id="kpi-accuracy">94.2<span class="kpi-unit">%</span></div>
+              <div class="kpi-label">Prediction Accuracy</div>
+            </div>
+            <div class="kpi-trend up"><i class="fa-solid fa-arrow-trend-up"></i> XGBoost</div>
+          </div>
+        </div>
+
+        <!-- MAP + SIDEBAR ROW -->
+        <div class="map-panel-row">
+          <!-- MAP -->
+          <div class="map-container">
+            <div class="map-toolbar">
+              <span class="map-label"><i class="fa-solid fa-satellite-dish"></i> Live Feed — Ahmedabad</span>
+              <div class="map-controls">
+                <button class="map-ctrl-btn active" id="map-all">All</button>
+                <button class="map-ctrl-btn" id="map-critical">Critical</button>
+                <button class="map-ctrl-btn" id="map-patrol">Patrol</button>
+              </div>
+            </div>
+            <div id="dashboard-map"></div>
+            <div class="map-legend">
+              <div class="legend-item"><span class="legend-dot" style="background:#ff5050"></span>Critical (70+)</div>
+              <div class="legend-item"><span class="legend-dot" style="background:#ffa500"></span>High (50–69)</div>
+              <div class="legend-item"><span class="legend-dot" style="background:#ffd700"></span>Medium (30–49)</div>
+              <div class="legend-item"><span class="legend-dot" style="background:#00c8ff"></span>Patrol Unit</div>
+            </div>
+          </div>
+
+          <!-- ALERT PANEL -->
+          <div class="alert-panel">
+            <div class="panel-header">
+              <span class="panel-title"><i class="fa-solid fa-bell"></i> Live Alert Feed</span>
+              <span class="live-badge">● LIVE</span>
+            </div>
+            <div class="alert-feed" id="alert-feed">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- DATA SOURCES BAR -->
+        <div class="data-sources-bar">
+          <span class="ds-label"><i class="fa-solid fa-database"></i> Live Data Sources:</span>
+          <div class="ds-pills">
+            <span class="ds-pill active"><i class="fa-solid fa-file-lines"></i> FIR Database</span>
+            <span class="ds-pill active"><i class="fa-solid fa-phone"></i> 112 Emergency</span>
+            <span class="ds-pill active"><i class="fa-solid fa-video"></i> CCTV Network</span>
+            <span class="ds-pill active"><i class="fa-solid fa-shield-virus"></i> Cyber Reports</span>
+            <span class="ds-pill active"><i class="fa-solid fa-satellite"></i> OSINT Feeds</span>
+            <span class="ds-pill active"><i class="fa-solid fa-car-on"></i> Patrol Logs</span>
+            <span class="ds-pill active"><i class="fa-solid fa-cloud-sun"></i> Weather API</span>
+            <span class="ds-pill active"><i class="fa-solid fa-network-wired"></i> Social Media</span>
+          </div>
+          <span class="ds-updated" id="ds-updated">Updated: Just now</span>
+        </div>
+      </div>
+      <!-- ── END SCREEN 1 ── -->
+
+
+      <!-- ── SCREEN 2: PREDICTION ENGINE ── -->
+      <div id="screen-prediction" class="screen">
+
+        <div class="screen-header">
+          <div class="screen-title-wrap">
+            <h1 class="screen-title">
+              <i class="fa-solid fa-brain"></i>
+              AI Crime Prediction Engine
+            </h1>
+            <p class="screen-subtitle">Multi-model ensemble forecasting — 48–72 hours ahead with SHAP explainability</p>
+          </div>
+          <div class="screen-actions">
+            <div class="model-badges">
+              <span class="tech-badge cyan">XGBoost</span>
+              <span class="tech-badge purple">LSTM</span>
+              <span class="tech-badge gold">GNN</span>
+              <span class="tech-badge green">SHAP XAI</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RISK CARDS ROW -->
+        <div class="risk-cards-row" id="risk-cards-row">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- CHARTS + SHAP ROW -->
+        <div class="pred-charts-row">
+          <!-- Model Accuracy Chart -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-title"><i class="fa-solid fa-chart-bar"></i> Model Accuracy Comparison</span>
+              <span class="chart-subtitle">Ensemble AI Performance</span>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="model-accuracy-chart"></canvas>
+            </div>
+          </div>
+
+          <!-- SHAP Panel -->
+          <div class="shap-card">
+            <div class="chart-card-header">
+              <span class="chart-title"><i class="fa-solid fa-magnifying-glass-chart"></i> Explainable AI — SHAP Values</span>
+              <span class="chart-subtitle">Navrangpura District · Risk Score: <span class="risk-score-inline">78/100</span> 🔴 CRITICAL</span>
+            </div>
+            <div class="shap-factors" id="shap-factors">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Prediction Line Chart -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-title"><i class="fa-solid fa-chart-line"></i> 7-Day Crime Trend Forecast</span>
+              <span class="chart-subtitle">Ahmedabad Metropolitan Area</span>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="crime-trend-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- RISK TABLE -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <span class="section-title"><i class="fa-solid fa-table-list"></i> Top Risk Zones — Next 48 Hours</span>
+            <div class="table-controls">
+              <span class="tech-badge cyan">AI-Ranked</span>
+              <span class="tech-badge purple">Auto-Updated</span>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="risk-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Zone</th>
+                  <th>Primary Crime</th>
+                  <th>Risk Score</th>
+                  <th>Confidence</th>
+                  <th>Patrol Priority</th>
+                  <th>AI Model</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="risk-table-body">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- ── END SCREEN 2 ── -->
+
+
+      <!-- ── SCREEN 3: CRIME HEATMAP ── -->
+      <div id="screen-heatmap" class="screen">
+
+        <div class="heatmap-layout">
+          <!-- Controls -->
+          <div class="heatmap-controls">
+            <div class="hm-ctrl-section">
+              <label class="ctrl-label">Crime Type</label>
+              <div class="ctrl-btn-group" id="crime-type-btns">
+                <button class="ctrl-btn active" data-type="all">All Crimes</button>
+                <button class="ctrl-btn" data-type="theft">Theft</button>
+                <button class="ctrl-btn" data-type="cyber">Cyber</button>
+                <button class="ctrl-btn" data-type="vehicle">Vehicle</button>
+                <button class="ctrl-btn" data-type="assault">Assault</button>
+                <button class="ctrl-btn" data-type="fraud">Fraud</button>
+              </div>
+            </div>
+            <div class="hm-ctrl-section">
+              <label class="ctrl-label">Time Range</label>
+              <div class="ctrl-btn-group" id="time-range-btns">
+                <button class="ctrl-btn active" data-range="24h">Last 24h</button>
+                <button class="ctrl-btn" data-range="7d">7 Days</button>
+                <button class="ctrl-btn" data-range="30d">30 Days</button>
+              </div>
+            </div>
+            <div class="hm-ctrl-section">
+              <label class="ctrl-label">Heatmap Legend</label>
+              <div class="heatmap-legend">
+                <div class="hm-legend-bar"></div>
+                <div class="hm-legend-labels">
+                  <span>Low</span>
+                  <span>Medium</span>
+                  <span>High</span>
+                  <span>Critical</span>
+                </div>
+              </div>
+            </div>
+            <div class="hm-ctrl-section hm-mini-stats">
+              <div class="mini-stat">
+                <span class="mini-stat-val" id="hm-events">1,247</span>
+                <span class="mini-stat-lbl">Crime Events</span>
+              </div>
+              <div class="mini-stat">
+                <span class="mini-stat-val" id="hm-predictions">89</span>
+                <span class="mini-stat-lbl">AI Predictions</span>
+              </div>
+              <div class="mini-stat">
+                <span class="mini-stat-val" id="hm-coverage">94%</span>
+                <span class="mini-stat-lbl">Patrol Coverage</span>
+              </div>
+              <div class="mini-stat danger">
+                <span class="mini-stat-val" id="hm-dangerous">Naroda</span>
+                <span class="mini-stat-lbl">Most Dangerous</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Heatmap -->
+          <div class="heatmap-map-wrap">
+            <div class="map-toolbar">
+              <span class="map-label"><i class="fa-solid fa-fire"></i> Crime Density Heatmap — Ahmedabad</span>
+              <div class="hm-status">
+                <span class="live-badge">● LIVE</span>
+                <span class="hm-type-label" id="hm-type-label">Showing: All Crimes</span>
+              </div>
+            </div>
+            <div id="heatmap-map"></div>
+          </div>
+        </div>
+      </div>
+      <!-- ── END SCREEN 3 ── -->
+
+
+      <!-- ── SCREEN 4: PATROL ROUTING ── -->
+      <div id="screen-routing" class="screen">
+
+        <div class="screen-header">
+          <div class="screen-title-wrap">
+            <h1 class="screen-title">
+              <i class="fa-solid fa-route"></i>
+              Smart Patrol Route Optimization
+            </h1>
+            <p class="screen-subtitle">AI-powered real-time patrol deployment — A* + Dijkstra + Reinforcement Learning</p>
+          </div>
+          <div class="screen-actions">
+            <span class="tech-badge cyan">A* Pathfinding</span>
+            <span class="tech-badge purple">Dijkstra</span>
+            <span class="tech-badge gold">Reinforcement Learning</span>
+          </div>
+        </div>
+
+        <div class="routing-layout">
+          <!-- Unit Roster -->
+          <div class="roster-panel">
+            <div class="panel-header">
+              <span class="panel-title"><i class="fa-solid fa-users"></i> Patrol Roster</span>
+              <span class="tech-badge green">6 Active</span>
+            </div>
+            <div class="roster-list" id="roster-list">
+              <!-- Populated by JS -->
+            </div>
+
+            <!-- Before/After Metrics -->
+            <div class="metrics-section">
+              <div class="metrics-title">Performance Improvement</div>
+              <div class="metric-compare">
+                <div class="mc-label">City Coverage</div>
+                <div class="mc-values">
+                  <span class="mc-before">47%</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                  <span class="mc-after">94%</span>
+                </div>
+                <div class="mc-bar"><div class="mc-fill" style="width:94%"></div></div>
+              </div>
+              <div class="metric-compare">
+                <div class="mc-label">Response Time</div>
+                <div class="mc-values">
+                  <span class="mc-before">18 min</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                  <span class="mc-after">12.6 min</span>
+                </div>
+                <div class="mc-bar"><div class="mc-fill green" style="width:81%"></div></div>
+              </div>
+              <div class="metric-compare">
+                <div class="mc-label">Crime Coverage Gaps</div>
+                <div class="mc-values">
+                  <span class="mc-before">High</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                  <span class="mc-after">Zero</span>
+                </div>
+                <div class="mc-bar"><div class="mc-fill gold" style="width:100%"></div></div>
+              </div>
+            </div>
+
+            <!-- Algorithm badges -->
+            <div class="algo-badges">
+              <div class="algo-badge cyan">
+                <i class="fa-solid fa-code-branch"></i>
+                <div>
+                  <div class="algo-name">A* Pathfinding</div>
+                  <div class="algo-desc">Optimal route calculation</div>
+                </div>
+              </div>
+              <div class="algo-badge purple">
+                <i class="fa-solid fa-diagram-project"></i>
+                <div>
+                  <div class="algo-name">Dijkstra Routing</div>
+                  <div class="algo-desc">Shortest path algorithm</div>
+                </div>
+              </div>
+              <div class="algo-badge gold">
+                <i class="fa-solid fa-robot"></i>
+                <div>
+                  <div class="algo-name">Reinforcement RL</div>
+                  <div class="algo-desc">Adaptive patrol learning</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Routing Map -->
+          <div class="routing-map-wrap">
+            <div class="map-toolbar">
+              <span class="map-label"><i class="fa-solid fa-route"></i> Live Patrol Routes — Ahmedabad</span>
+              <span class="live-badge">● LIVE TRACKING</span>
+            </div>
+            <div id="routing-map"></div>
+          </div>
+        </div>
+      </div>
+      <!-- ── END SCREEN 4 ── -->
+
+
+      <!-- ── SCREEN 5: OFFICER APP ── -->
+      <div id="screen-officer" class="screen">
+
+        <div class="screen-header">
+          <div class="screen-title-wrap">
+            <h1 class="screen-title">
+              <i class="fa-solid fa-mobile-screen-button"></i>
+              Officer Mobile Application
+            </h1>
+            <p class="screen-subtitle">Field officer interface — offline-capable Android patrol application</p>
+          </div>
+          <div class="screen-actions">
+            <span class="tech-badge green">● App Online</span>
+            <span class="tech-badge cyan">Offline-Capable</span>
+          </div>
+        </div>
+
+        <div class="officer-layout">
+          <!-- Phone mockup -->
+          <div class="phone-outer">
+            <div class="phone-frame">
+              <div class="phone-notch">
+                <div class="phone-camera"></div>
+                <div class="phone-speaker"></div>
+              </div>
+              <div class="phone-screen" id="phone-screen">
+                <!-- App status bar -->
+                <div class="app-status-bar">
+                  <span class="app-time" id="app-time">17:42</span>
+                  <div class="app-status-icons">
+                    <i class="fa-solid fa-signal"></i>
+                    <i class="fa-solid fa-wifi"></i>
+                    <i class="fa-solid fa-battery-three-quarters"></i>
+                  </div>
+                </div>
+
+                <!-- App header -->
+                <div class="app-header">
+                  <div class="app-logo">⬡ CrimeSphere</div>
+                  <div class="app-notif-icon">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="app-badge">3</span>
+                  </div>
+                </div>
+
+                <!-- Officer card -->
+                <div class="officer-card">
+                  <div class="officer-avatar">
+                    <i class="fa-solid fa-user-shield"></i>
+                  </div>
+                  <div class="officer-info">
+                    <div class="officer-name">SI Ravi Sharma</div>
+                    <div class="officer-rank">Sub-Inspector · Badge #AMB-2247</div>
+                    <div class="officer-unit">Unit P-03 · Navrangpura</div>
+                  </div>
+                  <div class="officer-status-badge on-duty">ON DUTY</div>
+                </div>
+
+                <!-- Risk meter -->
+                <div class="app-risk-section">
+                  <div class="app-section-label">Current Zone Risk</div>
+                  <div class="risk-meter-wrap">
+                    <div class="risk-meter-label">Navrangpura</div>
+                    <div class="risk-meter-bar">
+                      <div class="risk-meter-fill" style="width:78%"></div>
+                    </div>
+                    <div class="risk-meter-val critical">78 / 100 · CRITICAL</div>
+                  </div>
+                </div>
+
+                <!-- Mini map -->
+                <div class="app-map-section">
+                  <div class="app-section-label">Current Route</div>
+                  <div id="officer-mini-map"></div>
+                </div>
+
+                <!-- Active alert -->
+                <div class="app-alert-card">
+                  <div class="app-alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                  <div class="app-alert-body">
+                    <div class="app-alert-title">Chain Snatching Alert</div>
+                    <div class="app-alert-detail">Reported near Relief Road · 2 min ago · HIGH PRIORITY</div>
+                  </div>
+                  <div class="app-alert-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+
+                <!-- Quick actions -->
+                <div class="app-section-label">Quick Actions</div>
+                <div class="quick-actions-grid">
+                  <button class="quick-btn report">
+                    <i class="fa-solid fa-file-circle-plus"></i>
+                    <span>Report</span>
+                  </button>
+                  <button class="quick-btn backup">
+                    <i class="fa-solid fa-walkie-talkie"></i>
+                    <span>Backup</span>
+                  </button>
+                  <button class="quick-btn sos">
+                    <i class="fa-solid fa-siren-on"></i>
+                    <span>SOS</span>
+                  </button>
+                  <button class="quick-btn status">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>Status</span>
+                  </button>
+                  <button class="quick-btn camera">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>Camera</span>
+                  </button>
+                  <button class="quick-btn location">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <span>Location</span>
+                  </button>
+                </div>
+              </div>
+              <div class="phone-home-bar"></div>
+            </div>
+          </div>
+
+          <!-- App info panel -->
+          <div class="app-info-panel">
+            <div class="app-features-card">
+              <div class="section-card-header">
+                <span class="section-title"><i class="fa-solid fa-mobile-screen-button"></i> CrimeSphere Officer App</span>
+                <span class="tech-badge green">Android 13+</span>
+              </div>
+              <div class="feature-list">
+                <div class="feature-item">
+                  <i class="fa-solid fa-circle-check feature-icon cyan"></i>
+                  <div>
+                    <div class="feature-name">Real-Time Risk Intelligence</div>
+                    <div class="feature-desc">Live zone risk scores pushed via WebSocket</div>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <i class="fa-solid fa-circle-check feature-icon green"></i>
+                  <div>
+                    <div class="feature-name">AI Patrol Route Navigation</div>
+                    <div class="feature-desc">Optimized routes via A* + RL engine</div>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <i class="fa-solid fa-circle-check feature-icon purple"></i>
+                  <div>
+                    <div class="feature-name">Offline-Capable</div>
+                    <div class="feature-desc">Works without connectivity — syncs on reconnect</div>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <i class="fa-solid fa-circle-check feature-icon gold"></i>
+                  <div>
+                    <div class="feature-name">Instant Alert Push</div>
+                    <div class="feature-desc">Sub-second crime alert delivery to field officers</div>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <i class="fa-solid fa-circle-check feature-icon cyan"></i>
+                  <div>
+                    <div class="feature-name">RBAC Security</div>
+                    <div class="feature-desc">Role-based data access — Officer/Inspector/DCP</div>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <i class="fa-solid fa-circle-check feature-icon green"></i>
+                  <div>
+                    <div class="feature-name">Incident Reporting</div>
+                    <div class="feature-desc">Photo + GPS + voice-to-text FIR drafting</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- App stats -->
+            <div class="app-stats-grid">
+              <div class="app-stat-card">
+                <div class="app-stat-val cyan">6</div>
+                <div class="app-stat-lbl">Active Officers</div>
+              </div>
+              <div class="app-stat-card">
+                <div class="app-stat-val green">0.8s</div>
+                <div class="app-stat-lbl">Alert Latency</div>
+              </div>
+              <div class="app-stat-card">
+                <div class="app-stat-val gold">99.7%</div>
+                <div class="app-stat-lbl">App Uptime</div>
+              </div>
+              <div class="app-stat-card">
+                <div class="app-stat-val purple">AES-256</div>
+                <div class="app-stat-lbl">Encryption</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ── END SCREEN 5 ── -->
+
+    </main>
+  </div>
+</div>
+
+<!-- ─── CDN Scripts ─── -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<!-- ─── App Scripts ─── -->
+<script src="js/app.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/prediction.js"></script>
+<script src="js/heatmap.js"></script>
+<script src="js/routing.js"></script>
+<script src="js/officerapp.js"></script>
+
+</body>
+</html>

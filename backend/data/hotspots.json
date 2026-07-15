@@ -1,0 +1,10 @@
+[
+  { "id": "navrangpura", "name": "Navrangpura",  "lat": 23.0225, "lng": 72.5714, "risk": 78, "level": "critical", "crime": "Theft & Cyber Crime",     "conf": 94, "patrol": "P-03" },
+  { "id": "naroda",      "name": "Naroda",        "lat": 23.0835, "lng": 72.6472, "risk": 72, "level": "critical", "crime": "Assault & Theft",         "conf": 91, "patrol": "P-01" },
+  { "id": "sghighway",   "name": "SG Highway",    "lat": 23.0395, "lng": 72.5100, "risk": 65, "level": "high",     "crime": "Vehicle Crime",           "conf": 89, "patrol": "P-02" },
+  { "id": "maninagar",   "name": "Maninagar",     "lat": 22.9862, "lng": 72.5949, "risk": 61, "level": "high",     "crime": "Chain Snatching",         "conf": 88, "patrol": "P-04" },
+  { "id": "kalupur",     "name": "Kalupur",       "lat": 23.0225, "lng": 72.5936, "risk": 52, "level": "high",     "crime": "Fraud & Transit Crime",   "conf": 86, "patrol": "P-05" },
+  { "id": "satellite",   "name": "Satellite",     "lat": 23.0274, "lng": 72.5097, "risk": 55, "level": "high",     "crime": "Cyber Fraud",             "conf": 85, "patrol": "P-02" },
+  { "id": "vastrapur",   "name": "Vastrapur",     "lat": 23.0280, "lng": 72.5260, "risk": 48, "level": "medium",   "crime": "Residential Theft",       "conf": 82, "patrol": "P-06" },
+  { "id": "bopal",       "name": "Bopal",         "lat": 23.0350, "lng": 72.4700, "risk": 31, "level": "medium",   "crime": "Minor Theft & Break-ins", "conf": 78, "patrol": "P-06" }
+]

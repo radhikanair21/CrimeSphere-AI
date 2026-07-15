@@ -1,0 +1,24 @@
+{
+  "shap_factors": [
+    { "label": "Festival Activity (Navratri)", "value": 22, "maxVal": 25 },
+    { "label": "Cyber Fraud Spike (ATM link)", "value": 18, "maxVal": 25 },
+    { "label": "Historical Theft Pattern",     "value": 14, "maxVal": 25 },
+    { "label": "Crowd Density (Mobile data)",  "value": 11, "maxVal": 25 },
+    { "label": "Traffic Congestion",           "value": 7,  "maxVal": 25 },
+    { "label": "Weather Correlation",          "value": 6,  "maxVal": 25 }
+  ],
+  "risk_table_data": [
+    { "zone": "Navrangpura", "crime": "Theft & Cyber",    "risk": 78, "level": "critical", "conf": 94, "priority": "P1 — Immediate", "model": "XGBoost+LSTM",   "status": "ACTIVE ALERT"  },
+    { "zone": "Naroda",      "crime": "Assault & Theft",  "risk": 72, "level": "critical", "conf": 91, "priority": "P1 — Immediate", "model": "XGBoost",       "status": "ACTIVE ALERT"  },
+    { "zone": "SG Highway",  "crime": "Vehicle Crime",    "risk": 65, "level": "high",     "conf": 89, "priority": "P2 — High",     "model": "GNN+LSTM",      "status": "MONITORING"    },
+    { "zone": "Maninagar",   "crime": "Chain Snatching",  "risk": 61, "level": "high",     "conf": 88, "priority": "P2 — High",     "model": "Random Forest", "status": "MONITORING"    },
+    { "zone": "Satellite",   "crime": "Cyber Fraud",      "risk": 55, "level": "high",     "conf": 85, "priority": "P2 — High",     "model": "XGBoost",       "status": "WATCH"         },
+    { "zone": "Kalupur",     "crime": "Transit Fraud",    "risk": 52, "level": "high",     "conf": 86, "priority": "P2 — High",     "model": "LSTM",          "status": "WATCH"         },
+    { "zone": "Vastrapur",   "crime": "Residential Theft","risk": 48, "level": "medium",   "conf": 82, "priority": "P3 — Medium",   "model": "Random Forest", "status": "NORMAL"        },
+    { "zone": "Bopal",       "crime": "Minor Theft",      "risk": 31, "level": "medium",   "conf": 78, "priority": "P3 — Medium",   "model": "XGBoost",       "status": "NORMAL"        }
+  ],
+  "model_accuracy": {
+    "labels": ["XGBoost", "GNN", "Random Forest", "LSTM"],
+    "data": [94.2, 92.1, 91.8, 89.5]
+  }
+}

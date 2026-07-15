@@ -10,6 +10,24 @@ function initOfficerApp() {
   animateRiskMeter();
   setupQuickButtons();
   startOfficerAlertCycle();
+  loadOfficerProfile();
+}
+
+async function loadOfficerProfile() {
+  try {
+    const res = await fetch('http://localhost:8000/api/officer').then(r => r.json());
+    const nameEl = document.querySelector('.officer-name');
+    const rankEl = document.querySelector('.officer-rank');
+    const avatarEl = document.querySelector('.officer-avatar');
+    const unitEl = document.querySelector('.officer-unit');
+    
+    if (nameEl) nameEl.textContent = res.profile.name;
+    if (rankEl) rankEl.textContent = res.profile.rank + ' · ' + res.profile.badge;
+    if (avatarEl) avatarEl.textContent = res.profile.avatar;
+    if (unitEl) unitEl.textContent = 'UNIT ' + res.profile.unit + ' · ' + res.assigned_zone;
+  } catch (err) {
+    console.warn("Failed to load officer profile from API, utilizing local defaults");
+  }
 }
 
 function buildOfficerMiniMap() {
@@ -109,7 +127,7 @@ function setupQuickButtons() {
   });
 }
 
-const OFFICER_ALERTS = [
+const FALLBACK_OFFICER_ALERTS = [
   { title: 'Chain Snatching Alert',    detail: 'Relief Road · 2 suspects · HIGH',      color: '#ff5050' },
   { title: 'Cyber Fraud Warning',       detail: 'ATM Kalupur · Phishing active',        color: '#ff8c00' },
   { title: 'Crowd Anomaly — Naroda',   detail: 'Unusual gathering · Deploy backup',    color: '#ffd700' },
@@ -124,18 +142,38 @@ function startOfficerAlertCycle() {
   const detailEl = document.querySelector('.app-alert-detail');
   const card     = document.querySelector('.app-alert-card');
 
-  const id = setInterval(() => {
-    alertIndex = (alertIndex + 1) % OFFICER_ALERTS.length;
-    const alert = OFFICER_ALERTS[alertIndex];
-    if (titleEl)  titleEl.textContent  = alert.title;
-    if (detailEl) detailEl.textContent = alert.detail;
-    if (card) {
-      card.style.borderColor = alert.color + '50';
-      card.style.background  = alert.color + '10';
-    }
-    const iconEl = document.querySelector('.app-alert-icon i');
-    if (iconEl) {
-      iconEl.style.color = alert.color;
+  const id = setInterval(async () => {
+    try {
+      const res = await fetch('http://localhost:8000/api/officer').then(r => r.json());
+      if (res.current_alert) {
+        const alert = res.current_alert;
+        const levelColor = { critical: '#ff5050', high: '#ff8c00', medium: '#ffd700', low: '#32cd64' }[alert.level] || '#ffd700';
+        
+        if (titleEl)  titleEl.textContent  = alert.title;
+        if (detailEl) detailEl.textContent = alert.detail;
+        if (card) {
+          card.style.borderColor = levelColor + '50';
+          card.style.background  = levelColor + '10';
+        }
+        const iconEl = document.querySelector('.app-alert-icon i');
+        if (iconEl) {
+          iconEl.style.color = levelColor;
+        }
+      }
+    } catch (err) {
+      // Local fallback loop
+      alertIndex = (alertIndex + 1) % FALLBACK_OFFICER_ALERTS.length;
+      const alert = FALLBACK_OFFICER_ALERTS[alertIndex];
+      if (titleEl)  titleEl.textContent  = alert.title;
+      if (detailEl) detailEl.textContent = alert.detail;
+      if (card) {
+        card.style.borderColor = alert.color + '50';
+        card.style.background  = alert.color + '10';
+      }
+      const iconEl = document.querySelector('.app-alert-icon i');
+      if (iconEl) {
+        iconEl.style.color = alert.color;
+      }
     }
   }, 5000);
   APP.intervals.push(id);

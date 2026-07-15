@@ -9,8 +9,8 @@ let heatLayer = null;
 let currentType = 'all';
 let currentRange = '24h';
 
-// Raw heatmap data points per crime type [lat, lng, intensity]
-const HEAT_DATA = {
+// Raw local fallback data in case FastAPI backend is offline
+const FALLBACK_HEAT_DATA = {
   theft: [
     [23.0225, 72.5714, 0.9], [23.0240, 72.5730, 0.7], [23.0210, 72.5700, 0.8],
     [23.0835, 72.6472, 0.85],[23.0850, 72.6480, 0.6], [23.0820, 72.6460, 0.7],
@@ -42,10 +42,9 @@ const HEAT_DATA = {
     [23.0600, 72.5900, 0.4], [22.9950, 72.6000, 0.45],[23.0400, 72.6100, 0.4],
   ],
 };
-HEAT_DATA.all = Object.values(HEAT_DATA).flat();
+FALLBACK_HEAT_DATA.all = Object.values(FALLBACK_HEAT_DATA).flat();
 
-// Stats per type
-const HEAT_STATS = {
+const FALLBACK_HEAT_STATS = {
   all:     { events: 1247, predictions: 89, coverage: '94%', danger: 'Naroda' },
   theft:   { events: 482,  predictions: 34, coverage: '91%', danger: 'Navrangpura' },
   cyber:   { events: 318,  predictions: 22, coverage: '88%', danger: 'Kalupur' },
@@ -85,41 +84,78 @@ function buildHeatmapMap() {
   renderHeatLayer(map, 'all');
 }
 
-function renderHeatLayer(map, type) {
+async function renderHeatLayer(map, type) {
   if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
 
-  const data = HEAT_DATA[type] || HEAT_DATA.all;
-  heatLayer = L.heatLayer(data, {
-    radius: 35,
-    blur: 22,
-    maxZoom: 14,
-    max: 1.0,
-    gradient: {
-      0.2: '#2196F3',
-      0.4: '#4CAF50',
-      0.6: '#FFEB3B',
-      0.8: '#FF9800',
-      1.0: '#F44336',
-    },
-  });
-  heatLayer.addTo(map);
-  updateHeatStats(type);
-}
+  try {
+    const res = await fetch(`http://localhost:8000/api/heatmap?crime_type=${type}&time_range=${currentRange}`).then(r => r.json());
+    
+    heatLayer = L.heatLayer(res.data, {
+      radius: 18,
+      blur: 10,
+      maxZoom: 14,
+      max: 1.0,
+      gradient: {
+        0.2: '#2196F3',
+        0.4: '#4CAF50',
+        0.6: '#FFEB3B',
+        0.8: '#FF9800',
+        1.0: '#F44336',
+      },
+    });
+    heatLayer.addTo(map);
+    
+    // Update stats from backend
+    const ev = document.getElementById('hm-events');
+    const pr = document.getElementById('hm-predictions');
+    const co = document.getElementById('hm-coverage');
+    const dg = document.getElementById('hm-dangerous');
+    if (ev) ev.textContent = res.stats.events.toLocaleString();
+    if (pr) pr.textContent = res.stats.predictions;
+    if (co) co.textContent = res.stats.coverage;
+    if (dg) dg.textContent = res.stats.danger;
 
-function updateHeatStats(type) {
-  const stats = HEAT_STATS[type] || HEAT_STATS.all;
-  const ev = document.getElementById('hm-events');
-  const pr = document.getElementById('hm-predictions');
-  const co = document.getElementById('hm-coverage');
-  const dg = document.getElementById('hm-dangerous');
-  if (ev) ev.textContent = stats.events.toLocaleString();
-  if (pr) pr.textContent = stats.predictions;
-  if (co) co.textContent = stats.coverage;
-  if (dg) dg.textContent = stats.danger;
+    const label = document.getElementById('hm-type-label');
+    const names = { all: 'All Crimes', theft: 'Theft', cyber: 'Cyber Crime', vehicle: 'Vehicle Crime', assault: 'Assault', fraud: 'Fraud' };
+    if (label) label.textContent = 'Showing: ' + (names[type] || type);
 
-  const label = document.getElementById('hm-type-label');
-  const names = { all: 'All Crimes', theft: 'Theft', cyber: 'Cyber Crime', vehicle: 'Vehicle Crime', assault: 'Assault', fraud: 'Fraud' };
-  if (label) label.textContent = 'Showing: ' + (names[type] || type);
+  } catch (err) {
+    // Local fallback
+    const data = FALLBACK_HEAT_DATA[type] || FALLBACK_HEAT_DATA.all;
+    const multiplier = { '24h': 1.0, '7d': 1.4, '30d': 1.8 }[currentRange] || 1.0;
+    const scaled = data.map(([lat, lng, val]) => [lat, lng, Math.min(val * multiplier, 1.0)]);
+    
+    heatLayer = L.heatLayer(scaled, {
+      radius: 18,
+      blur: 10,
+      maxZoom: 14,
+      max: 1.0,
+      gradient: {
+        0.2: '#2196F3',
+        0.4: '#4CAF50',
+        0.6: '#FFEB3B',
+        0.8: '#FF9800',
+        1.0: '#F44336',
+      },
+    });
+    heatLayer.addTo(map);
+    
+    const stats = FALLBACK_HEAT_STATS[type] || FALLBACK_HEAT_STATS.all;
+    const rm = { '24h': 1, '7d': 7, '30d': 30 }[currentRange] || 1;
+    const ev = document.getElementById('hm-events');
+    const pr = document.getElementById('hm-predictions');
+    const co = document.getElementById('hm-coverage');
+    const dg = document.getElementById('hm-dangerous');
+    
+    if (ev) ev.textContent = Math.round(stats.events * rm * 0.85).toLocaleString();
+    if (pr) pr.textContent = stats.predictions;
+    if (co) co.textContent = stats.coverage;
+    if (dg) dg.textContent = stats.danger;
+
+    const label = document.getElementById('hm-type-label');
+    const names = { all: 'All Crimes', theft: 'Theft', cyber: 'Cyber Crime', vehicle: 'Vehicle Crime', assault: 'Assault', fraud: 'Fraud' };
+    if (label) label.textContent = 'Showing: ' + (names[type] || type);
+  }
 }
 
 function buildHeatmapControls() {
@@ -139,18 +175,7 @@ function buildHeatmapControls() {
       document.querySelectorAll('#time-range-btns .ctrl-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentRange = btn.dataset.range;
-      // Simulate different intensity for different time ranges
-      if (window.heatMap) {
-        const multiplier = { '24h': 1.0, '7d': 1.4, '30d': 1.8 }[currentRange] || 1.0;
-        const scaled = (HEAT_DATA[currentType] || HEAT_DATA.all).map(([lat, lng, val]) => [lat, lng, Math.min(val * multiplier, 1.0)]);
-        if (heatLayer) window.heatMap.removeLayer(heatLayer);
-        heatLayer = L.heatLayer(scaled, { radius: 35, blur: 22, max: 1.0, gradient: { 0.2:'#2196F3', 0.4:'#4CAF50', 0.6:'#FFEB3B', 0.8:'#FF9800', 1.0:'#F44336' } });
-        heatLayer.addTo(window.heatMap);
-        const stats = HEAT_STATS[currentType] || HEAT_STATS.all;
-        const rm = { '24h': 1, '7d': 7, '30d': 30 }[currentRange] || 1;
-        const ev = document.getElementById('hm-events');
-        if (ev) ev.textContent = Math.round(stats.events * rm * 0.85).toLocaleString();
-      }
+      if (window.heatMap) renderHeatLayer(window.heatMap, currentType);
     });
   });
 }

@@ -35,8 +35,13 @@
         </div>
       </div>
     </div>
-
-
+    
+    <div class="header-center" style="flex:1; max-width:400px; margin: 0 20px;">
+      <div style="position:relative; display:flex; align-items:center;">
+        <i class="fa-solid fa-microphone" id="voice-query-mic" style="position:absolute; left:12px; color:#00c8ff; cursor:pointer;" title="Click to speak (voice search)"></i>
+        <input type="text" id="voice-query-input" placeholder="Ask AI: e.g. 'closest unit to Vastrapur'..." style="width:100%; background:#0d1235; border:1px solid #1a2450; border-radius:20px; padding:8px 16px 8px 36px; color:#e8eeff; font-family:Outfit,sans-serif; font-size:12px; outline:none; transition: border-color 0.2s;" />
+      </div>
+    </div>
     <div class="header-right">
       <div class="header-info">
         <div class="live-time-wrap">
@@ -87,10 +92,6 @@
       </nav>
 
       <div class="sidebar-footer">
-        <div class="sidebar-team">
-          <i class="fa-solid fa-users"></i>
-          <span>Team nullRoot</span>
-        </div>
         <div class="sidebar-version">v2.4.1 • Build 2026</div>
       </div>
     </aside>
@@ -289,9 +290,11 @@
         <div class="section-card">
           <div class="section-card-header">
             <span class="section-title"><i class="fa-solid fa-table-list"></i> Top Risk Zones — Next 48 Hours</span>
-            <div class="table-controls">
+            <div class="table-controls" style="display:flex; gap:6px;">
+              <span class="tech-badge red" id="export-pdf" style="cursor:pointer;" title="Export Table as PDF"><i class="fa-solid fa-file-pdf"></i> Export PDF</span>
+              <span class="tech-badge purple" id="export-csv" style="cursor:pointer;" title="Export Table as CSV"><i class="fa-solid fa-file-csv"></i> Export CSV</span>
+              <span class="tech-badge gold" id="export-json" style="cursor:pointer;" title="Export Table as JSON"><i class="fa-solid fa-file-code"></i> Export JSON</span>
               <span class="tech-badge cyan">AI-Ranked</span>
-              <span class="tech-badge purple">Auto-Updated</span>
             </div>
           </div>
           <div class="table-wrap">
@@ -452,30 +455,7 @@
               </div>
             </div>
 
-            <!-- Algorithm badges -->
-            <div class="algo-badges">
-              <div class="algo-badge cyan">
-                <i class="fa-solid fa-code-branch"></i>
-                <div>
-                  <div class="algo-name">A* Pathfinding</div>
-                  <div class="algo-desc">Optimal route calculation</div>
-                </div>
-              </div>
-              <div class="algo-badge purple">
-                <i class="fa-solid fa-diagram-project"></i>
-                <div>
-                  <div class="algo-name">Dijkstra Routing</div>
-                  <div class="algo-desc">Shortest path algorithm</div>
-                </div>
-              </div>
-              <div class="algo-badge gold">
-                <i class="fa-solid fa-robot"></i>
-                <div>
-                  <div class="algo-name">Reinforcement RL</div>
-                  <div class="algo-desc">Adaptive patrol learning</div>
-                </div>
-              </div>
-            </div>
+            <!-- Algorithm badges removed from view -->
           </div>
 
           <!-- Routing Map -->
@@ -686,6 +666,90 @@
         </div>
       </div>
       <!-- ── END SCREEN 5 ── -->
+
+      <!-- ── SCREEN 6: SETTINGS (COMPLIANCE & CONTROL PANEL) ── -->
+      <div id="screen-settings" class="screen">
+        <div class="screen-header">
+          <div class="screen-title-wrap">
+            <h1 class="screen-title">
+              <i class="fa-solid fa-gear"></i>
+              System Settings & Compliance Dashboard
+            </h1>
+            <p class="screen-subtitle">Role-Based Access Control, Security Audit Logs, and Scenario Simulations</p>
+          </div>
+          <div class="screen-actions">
+            <span class="tech-badge red" id="compliance-status">IT Act Compliant</span>
+            <span class="tech-badge cyan">RBAC Enabled</span>
+          </div>
+        </div>
+
+        <div class="pred-charts-row" style="grid-template-columns: 1fr 1fr;">
+          <!-- Scenario Simulator Control -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Scenario Simulation Control</span>
+              <span class="chart-subtitle">Trigger localized district risk shifts</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">
+              <p style="font-size:12px; color:#7a8bb5; margin-bottom:0;">Activate specific municipal scenarios to see predictions, GNN risk scores, and optimal patrol routes dynamically adjust.</p>
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                <button class="btn-accent" id="sim-navratri-btn"><i class="fa-solid fa-dharmachakra"></i> Simulate Navratri</button>
+                <button class="btn-ghost" id="sim-phishing-btn"><i class="fa-solid fa-shield-virus"></i> Simulate Phishing</button>
+                <button class="btn-ghost" id="sim-normal-btn"><i class="fa-solid fa-circle-check"></i> Restore Normalcy</button>
+                <button class="btn-ghost" id="sim-emergency-btn"><i class="fa-solid fa-truck-medical"></i> Trigger 112 Surge</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Role-Based Access Control (RBAC) -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-title"><i class="fa-solid fa-user-shield"></i> Role-Based Access Control (RBAC)</span>
+              <span class="chart-subtitle">Switch active system credentials</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">
+              <p style="font-size:12px; color:#7a8bb5; margin-bottom:0;">Currently logged in as officer. Higher roles gain extended audit, map filtering, and administrative overrides.</p>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <label style="font-size:12px; color:#e8eeff; min-width:80px;">Active Role:</label>
+                <select id="user-role-select" style="background:#0d1235; border:1px solid #1a2450; color:#e8eeff; padding:6px 12px; border-radius:6px; flex:1; outline:none; font-family:Outfit,sans-serif; cursor:pointer;">
+                  <option value="officer">Officer (SI Ravi Sharma)</option>
+                  <option value="inspector">Inspector (Maninagar Sector)</option>
+                  <option value="dcp">DCP (Zone 1 Ahmedabad)</option>
+                  <option value="commissioner">Commissioner of Police</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compliance & Audit Log Card -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <span class="section-title"><i class="fa-solid fa-list-check"></i> System Audit & Compliance Logs</span>
+            <div class="table-controls">
+              <span class="tech-badge gold">Audit Active</span>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="audit-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Actor ID</th>
+                  <th>Role</th>
+                  <th>Action Performed</th>
+                  <th>Resource Scope</th>
+                  <th>IP Address</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="audit-table-body">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
     </main>
   </div>

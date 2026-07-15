@@ -1,0 +1,8 @@
+[
+  { "id": "P-01", "officer": "SI Rajesh Kumar",   "zone": "Naroda",       "lat": 23.0820, "lng": 72.6460, "status": "patrolling", "fuel": 82, "color": "#00c8ff" },
+  { "id": "P-02", "officer": "ASI Priya Sharma",  "zone": "SG Highway",   "lat": 23.0380, "lng": 72.5090, "status": "patrolling", "fuel": 68, "color": "#8a2be2" },
+  { "id": "P-03", "officer": "SI Ravi Sharma",    "zone": "Navrangpura",  "lat": 23.0210, "lng": 72.5700, "status": "active",     "fuel": 75, "color": "#ffd700" },
+  { "id": "P-04", "officer": "HC Amit Patel",     "zone": "Maninagar",    "lat": 22.9850, "lng": 72.5940, "status": "patrolling", "fuel": 91, "color": "#32cd64" },
+  { "id": "P-05", "officer": "SI Meera Joshi",    "zone": "Kalupur",      "lat": 23.0215, "lng": 72.5920, "status": "active",     "fuel": 55, "color": "#ff8c00" },
+  { "id": "P-06", "officer": "ASI Deepak Shah",   "zone": "Vastrapur",    "lat": 23.0270, "lng": 72.5250, "status": "standby",    "fuel": 95, "color": "#ff5050" }
+]

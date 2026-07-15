@@ -1,0 +1,21 @@
+{
+  "templates": [
+    { "level": "critical", "icon": "fa-siren-on",         "title": "Chain Snatching — Active",       "detail": "Navrangpura, near Law Garden · 2 suspects on bike",     "zone": "Navrangpura" },
+    { "level": "critical", "icon": "fa-triangle-exclamation", "title": "ATM Fraud Alert — CRITICAL",  "detail": "Kalupur · Cyber-physical link detected · Alert P-05",   "zone": "Kalupur"     },
+    { "level": "high",     "icon": "fa-car-burst",         "title": "Vehicle Theft — SG Highway",    "detail": "Near GIFT City bypass · Suspect vehicle spotted",         "zone": "SG Highway"  },
+    { "level": "high",     "icon": "fa-shield-virus",      "title": "Phishing Campaign Active",      "detail": "OTP-based fraud targeting Maninagar residents",           "zone": "Maninagar"   },
+    { "level": "high",     "icon": "fa-people-robbery",    "title": "Crowd Anomaly — Naroda",        "detail": "Unusual gathering detected · Festival risk spike",        "zone": "Naroda"      },
+    { "level": "medium",   "icon": "fa-video",             "title": "CCTV Blind Spot Report",        "detail": "Camera 147 offline — Satellite Zone, Ambawadi Rd",       "zone": "Satellite"   },
+    { "level": "medium",   "icon": "fa-brain",             "title": "AI Prediction — Bopal",         "detail": "Night theft risk +23% · Deploy P-06 to Bopal sector",    "zone": "Bopal"       },
+    { "level": "low",      "icon": "fa-circle-check",      "title": "Patrol Check-in — P-04",        "detail": "HC Amit Patel · Maninagar East · All clear",             "zone": "Maninagar"   },
+    { "level": "low",      "icon": "fa-wind",              "title": "Weather Update",                 "detail": "High wind tonight may affect CCTV coverage in Bopal",    "zone": "Bopal"       },
+    { "level": "critical", "icon": "fa-wifi",              "title": "OSINT Threat Intelligence",     "detail": "Dark web forum activity near Vastrapur correlated",       "zone": "Vastrapur"   }
+  ],
+  "history": [
+    { "level": "critical", "icon": "fa-siren-on",         "title": "Chain Snatching — Active",       "detail": "Navrangpura, near Law Garden · 2 suspects on bike",     "zone": "Navrangpura", "timestamp": 0 },
+    { "level": "critical", "icon": "fa-triangle-exclamation", "title": "ATM Fraud Alert — CRITICAL",  "detail": "Kalupur · Cyber-physical link detected · Alert P-05",   "zone": "Kalupur", "timestamp": 10 },
+    { "level": "high",     "icon": "fa-car-burst",         "title": "Vehicle Theft — SG Highway",    "detail": "Near GIFT City bypass · Suspect vehicle spotted",         "zone": "SG Highway", "timestamp": 20 },
+    { "level": "high",     "icon": "fa-shield-virus",      "title": "Phishing Campaign Active",      "detail": "OTP-based fraud targeting Maninagar residents",           "zone": "Maninagar", "timestamp": 35 },
+    { "level": "medium",   "icon": "fa-video",             "title": "CCTV Blind Spot Report",        "detail": "Camera 147 offline — Satellite Zone, Ambawadi Rd",       "zone": "Satellite", "timestamp": 50 }
+  ]
+}

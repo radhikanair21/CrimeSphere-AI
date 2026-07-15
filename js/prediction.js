@@ -5,7 +5,10 @@
 
 'use strict';
 
-const SHAP_FACTORS = [
+let SHAP_FACTORS = [];
+let RISK_TABLE_DATA = [];
+
+const FALLBACK_SHAP_FACTORS = [
   { label: 'Festival Activity (Navratri)', value: 22, maxVal: 25 },
   { label: 'Cyber Fraud Spike (ATM link)', value: 18, maxVal: 25 },
   { label: 'Historical Theft Pattern',     value: 14, maxVal: 25 },
@@ -14,7 +17,7 @@ const SHAP_FACTORS = [
   { label: 'Weather Correlation',          value: 6,  maxVal: 25 },
 ];
 
-const RISK_TABLE_DATA = [
+const FALLBACK_RISK_TABLE_DATA = [
   { zone: 'Navrangpura', crime: 'Theft & Cyber',    risk: 78, level: 'critical', conf: 94, priority: 'P1 — Immediate', model: 'XGBoost+LSTM',   status: 'ACTIVE ALERT'  },
   { zone: 'Naroda',      crime: 'Assault & Theft',  risk: 72, level: 'critical', conf: 91, priority: 'P1 — Immediate', model: 'XGBoost',       status: 'ACTIVE ALERT'  },
   { zone: 'SG Highway',  crime: 'Vehicle Crime',    risk: 65, level: 'high',     conf: 89, priority: 'P2 — High',     model: 'GNN+LSTM',      status: 'MONITORING'    },
@@ -25,18 +28,116 @@ const RISK_TABLE_DATA = [
   { zone: 'Bopal',       crime: 'Minor Theft',      risk: 31, level: 'medium',   conf: 78, priority: 'P3 — Medium',   model: 'XGBoost',       status: 'NORMAL'        },
 ];
 
-function initPrediction() {
+fn_initPrediction();
+
+async function fn_initPrediction() {
+  try {
+    const res = await fetch('http://localhost:8000/api/predictions').then(r => r.json());
+    SHAP_FACTORS = res.shap_factors;
+    RISK_TABLE_DATA = res.risk_table_data;
+  } catch (err) {
+    console.warn("FastAPI prediction offline, loading local predictions fallback datasets:", err);
+    SHAP_FACTORS = FALLBACK_SHAP_FACTORS;
+    RISK_TABLE_DATA = FALLBACK_RISK_TABLE_DATA;
+  }
   buildRiskCards();
   buildModelAccuracyChart();
   buildCrimeTrendChart();
   buildSHAPPanel();
   buildRiskTable();
+  setupExportListeners();
+}
+
+function initPrediction() {
+  fn_initPrediction();
+}
+
+// ── Export Actions (CSV, JSON, PDF) ───────────────────────────
+function setupExportListeners() {
+  document.getElementById('export-csv')?.addEventListener('click', () => {
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Zone,Primary Crime,Risk Score,Confidence,Priority,AI Model,Status\n";
+    RISK_TABLE_DATA.forEach(row => {
+      csvContent += `"${row.zone}","${row.crime}",${row.risk},${row.conf},"${row.priority}","${row.model}","${row.status}"\n`;
+    });
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "crimesphere_risk_zones.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+
+  document.getElementById('export-json')?.addEventListener('click', () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(RISK_TABLE_DATA, null, 2));
+    const link = document.createElement("a");
+    link.setAttribute("href", dataStr);
+    link.setAttribute("download", "crimesphere_risk_zones.json");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+
+  document.getElementById('export-pdf')?.addEventListener('click', () => {
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <html>
+      <head>
+        <title>CrimeSphere AI - Top Risk Zones Export</title>
+        <style>
+          body { font-family: sans-serif; padding: 20px; color: #333; }
+          h1 { color: #0a0f2e; border-bottom: 2px solid #00c8ff; padding-bottom: 10px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+          th { background: #f2f2f2; }
+        </style>
+      </head>
+      <body>
+        <h1>CrimeSphere AI — Top Risk Zones Report</h1>
+        <p>Report Generated: ${new Date().toLocaleString()}</p>
+        <p>Ahmedabad Metropolitan Area Predictive Policing Analysis</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Zone</th>
+              <th>Primary Crime</th>
+              <th>Risk Score</th>
+              <th>Confidence</th>
+              <th>Priority</th>
+              <th>AI Model</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${RISK_TABLE_DATA.map(row => `
+              <tr>
+                <td><b>${row.zone}</b></td>
+                <td>${row.crime}</td>
+                <td>${row.risk}/100</td>
+                <td>${row.conf}%</td>
+                <td>${row.priority}</td>
+                <td>${row.model}</td>
+                <td>${row.status}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <script>
+          window.onload = function() { window.print(); window.close(); }
+        </script>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+  });
 }
 
 // ── Risk Cards ────────────────────────────────────────────────
 function buildRiskCards() {
   const container = document.getElementById('risk-cards-row');
   if (!container) return;
+  container.innerHTML = ''; 
 
   const topZones = ZONES.slice(0, 5);
   topZones.forEach(zone => {
@@ -197,6 +298,7 @@ function buildCrimeTrendChart() {
 function buildSHAPPanel() {
   const container = document.getElementById('shap-factors');
   if (!container) return;
+  container.innerHTML = ''; 
 
   SHAP_FACTORS.forEach(factor => {
     const pct = (factor.value / factor.maxVal) * 100;
@@ -212,7 +314,6 @@ function buildSHAPPanel() {
     container.appendChild(row);
   });
 
-  // Animate bars after a brief delay
   setTimeout(() => {
     container.querySelectorAll('.shap-bar-fill').forEach(bar => {
       bar.style.width = bar.dataset.target + '%';
@@ -224,14 +325,15 @@ function buildSHAPPanel() {
 function buildRiskTable() {
   const tbody = document.getElementById('risk-table-body');
   if (!tbody) return;
+  tbody.innerHTML = ''; 
 
-  const priorityClass = { 'P1 — Immediate': 'p1', 'P2 — High': 'p2', 'P3 — Medium': 'p3' };
+  const priorityClass = { 'P1 — Immediate': 'p1', 'P2 — High': 'p2', 'P3 — Medium': 'p3', 'P4 — Low': 'p4' };
   const statusColor   = { 'ACTIVE ALERT': '#ff5050', 'MONITORING': '#ff8c00', 'WATCH': '#ffd700', 'NORMAL': '#32cd64' };
 
   RISK_TABLE_DATA.forEach((row, i) => {
     const tr = document.createElement('tr');
     const confPct = row.conf;
-    const pClass  = priorityClass[row.priority] || 'p3';
+    const pClass  = priorityClass[row.priority] || 'p4';
     const sColor  = statusColor[row.status] || '#7a8bb5';
 
     tr.innerHTML = `

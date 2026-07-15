@@ -146,19 +146,44 @@ function buildRoutingMap() {
   APP.intervals.push(id);
 }
 
-function animateRoutingUnits() {
-  Object.values(unitStates).forEach(state => {
-    state.wpIndex = (state.wpIndex + 1) % state.waypoints.length;
-    const wp = state.waypoints[state.wpIndex];
-    state.marker.setLatLng(wp);
-  });
+async function animateRoutingUnits() {
+  try {
+    const res = await fetch('http://localhost:8000/api/patrols').then(r => r.json());
+    res.patrols.forEach(unit => {
+      const state = unitStates[unit.id];
+      if (state) {
+        state.marker.setLatLng([unit.lat, unit.lng]);
+      }
+    });
+    
+    // Periodically redraw the list panel to show updated fuel and status from backend
+    updateRosterPanel(res.patrols);
+  } catch (err) {
+    // Local fallback: cycle waypoints
+    Object.values(unitStates).forEach(state => {
+      state.wpIndex = (state.wpIndex + 1) % state.waypoints.length;
+      const wp = state.waypoints[state.wpIndex];
+      state.marker.setLatLng(wp);
+    });
+  }
 }
 
 function buildRosterList() {
   const container = document.getElementById('roster-list');
   if (!container) return;
+  
+  updateRosterPanel(PATROL_UNITS);
+}
 
-  PATROL_UNITS.forEach(unit => {
+function updateRosterPanel(patrolUnits) {
+  const container = document.getElementById('roster-list');
+  if (!container) return;
+  
+  // Save scroll position
+  const scrollTop = container.scrollTop;
+  container.innerHTML = '';
+
+  patrolUnits.forEach(unit => {
     const route = PATROL_ROUTES.find(r => r.id === unit.id);
     const item = document.createElement('div');
     item.className = 'roster-item';
@@ -167,7 +192,9 @@ function buildRosterList() {
 
     const statusClass = unit.status === 'patrolling' ? 'patrolling' : unit.status === 'active' ? 'active' : 'standby';
     const fuelColor = unit.fuel > 70 ? '#32cd64' : unit.fuel > 40 ? '#ffd700' : '#ff5050';
-    const eta = Math.floor(Math.random() * 8) + 2;
+    
+    // Deterministic mock ETA based on unit id
+    const eta = (unit.id.charCodeAt(3) - 48) * 2 + 1;
 
     item.innerHTML = `
       <div class="roster-unit-id" style="border-color:${route?.color}40;color:${route?.color};background:${route?.color}18">${unit.id}</div>
@@ -200,4 +227,6 @@ function buildRosterList() {
 
     container.appendChild(item);
   });
+  
+  container.scrollTop = scrollTop;
 }
